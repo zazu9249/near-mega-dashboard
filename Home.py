@@ -82,5 +82,29 @@ tab2, tab1 = st.tabs(
 )
 
 with tab2:
-    st.header("Metrics")
-    
+    st.subheader("Active Nodes")
+    c1, c2 = st.columns([1,3])
+    with c1:
+        total_active_nodes = pd.read_json('https://node-api.flipsidecrypto.com/api/v2/queries/43656c5e-7d7b-4986-b03f-fd114ca4b1d5/data/latest')
+        st.metric(label='**Total Unique Nodes**', value=str(total_active_nodes['TOTAL_NODES_COUNT'].values[0]))
+    with c2:
+        time_span = st.selectbox(
+            'Select the time span to view the Active Nodes over Time',
+            [
+                "By Day", "By Week", "By Month"
+            ],
+            key="select_timespan",
+        )
+    active_nodes = pd.read_json('https://node-api.flipsidecrypto.com/api/v2/queries/9cb68077-5821-4e26-8d4b-aa57421d4a1f/data/latest')
+    if time_span == "By Day":
+        active_nodes = pd.read_json('https://node-api.flipsidecrypto.com/api/v2/queries/9cb68077-5821-4e26-8d4b-aa57421d4a1f/data/latest')
+    elif time_span == "By Week":
+        active_nodes = pd.read_json('https://node-api.flipsidecrypto.com/api/v2/queries/0a88df20-d8e6-41d3-b5db-7afb983d2716/data/latest')
+    elif time_span == "By Month":
+        active_nodes = pd.read_json('https://node-api.flipsidecrypto.com/api/v2/queries/e1c1835b-9033-4455-b787-aeaa0ff9cf84/data/latest')
+    fig = px.bar(title='Number of Active Nodes over selected Time', x=active_nodes['DAY'], y=active_nodes['NO_OF_ACTIVE_NODES'], color='yellow')
+    fig.update_layout(legend_title=None, xaxis_title='Day', yaxis_title='Active Nodes')
+    st.plotly_chart(fig, use_container_width=True, theme=theme_plotly)
+
+
+
