@@ -102,7 +102,7 @@ with tab2:
         active_nodes = pd.read_json('https://node-api.flipsidecrypto.com/api/v2/queries/0a88df20-d8e6-41d3-b5db-7afb983d2716/data/latest')
     elif time_span == "By Month":
         active_nodes = pd.read_json('https://node-api.flipsidecrypto.com/api/v2/queries/e1c1835b-9033-4455-b787-aeaa0ff9cf84/data/latest')
-    fig = px.bar(title='Number of Active Nodes over selected Time', x=active_nodes['DAY'], y=active_nodes['NO_OF_ACTIVE_NODES'], color='yellow')
+    fig = px.bar(active_nodes,title='Number of Active Nodes over selected Time', x=active_nodes['DAY'], y=active_nodes['NO_OF_ACTIVE_NODES'])
     fig.update_layout(legend_title=None, xaxis_title='Day', yaxis_title='Active Nodes')
     st.plotly_chart(fig, use_container_width=True, theme=theme_plotly)
 
