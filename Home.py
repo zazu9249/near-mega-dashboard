@@ -74,14 +74,26 @@ fig = px.line(df, x='HOUR', y='HOURLY_PRICE', title='Hourly Price Trend of NEAR'
 fig.update_layout(legend_title=None, xaxis_title='Hour', yaxis_title='Price (in $)')
 st.plotly_chart(fig, use_container_width=True, theme=theme_plotly)
 
-tab2, tab1 = st.tabs(
+tab5, tab4, tab3, tab2, tab1 = st.tabs(
     [
         "**Metrics**",
-        "**Activity over Time**"
+        "**Swaps**",
+        "**GAS & Fees**",
+        "**Development**",
+        "**Staking**"
     ]
 )
 
-with tab2:
+with tab5:
+    st.write(
+        """
+        Blockchain metrics are used to measure the quality, performance and scalability of 
+        blockchain applications and to establish benchmarks for different versions of blockchain 
+        applications to be compared against each other.
+        
+        The following are common metrics, all of which are measured at runtime, while the blockchain application is active.
+        """
+    )
     st.subheader("Active Nodes")
     st.write(
         """
@@ -203,6 +215,82 @@ with tab2:
     fig.update_layout(legend_title=None, xaxis_title='Day', yaxis_title="Latency")
     st.plotly_chart(fig, use_container_width=True, theme=theme_plotly)
 
+with tab4:
+    st.write(
+        """
+        Swap facilitates the instant exchange of two non-native tokens between two unique 
+        blockchain protocols without the need of commencing the traditional crypto-to-fiat 
+        exchange or token migration. It allows users to swap tokens directly from the official 
+        private key wallet or the trading account. In-wallet exchange offers multiple benefits 
+        for the traders, such as non-custodial trading, on-chain exchange, faster transactions, 
+        and zero network fees.
+        """
+    )
+
+    c1, c2 = st.columns([1,1])
+    total_swaps = pd.read_json('https://node-api.flipsidecrypto.com/api/v2/queries/e27380a3-b603-4eef-ab5f-1bb0a3ed2255/data/latest')
+    with c1:
+        st.metric(label='**Total Number of Swaps**', value=str(total_swaps['TOTAL_SWAPS'].values[0]))
+    with c2:
+        st.metric(label='**Total Number of Unique Traders**', value=str(total_swaps['NO_OF_SWAPPERS'].values[0]))
+
+    swap_activity = pd.read_json('https://node-api.flipsidecrypto.com/api/v2/queries/6b8977d0-da7e-404c-bc80-07b45b6e223b/data/latest')
+    fig = px.bar(swap_activity, x="DAY", y=["TOTAL_SWAPS", "NO_OF_SWAPPERS"], title="Swap Metrics over Time")
+    st.plotly_chart(fig, use_container_width=True, theme=theme_plotly)
+
+    c1, c2 = st.columns([1,1])
+    with c1:
+        top_traders_1 = pd.read_json('https://node-api.flipsidecrypto.com/api/v2/queries/e13bdb4f-4590-4420-a3d3-2e120326c292/data/latest')
+        fig = px.pie(top_traders_1, values='NO_OF_SWAPS', names='SWAPPER', title='Top Swappers by Swaps Count')
+        fig.update_layout(showlegend = False)
+        st.plotly_chart(fig, use_container_width=True, theme=theme_plotly)
+
+    with c2:
+        top_traders_2 = pd.read_json('https://node-api.flipsidecrypto.com/api/v2/queries/1e8af9f9-5fd0-4411-85b8-104f10cbd82a/data/latest')
+        fig = px.pie(top_traders_2, values='TOTAL_SWAP_IN_VOLUME_USD', names='SWAPPER', title='Top Swappers by Swap Volume')
+        fig.update_layout(showlegend = False)
+        st.plotly_chart(fig, use_container_width=True, theme=theme_plotly)
+    
+    st.subheader("SWAPs of NEAR Token")
+    c1, c2 = st.columns([1,1])
+    near_swaps = pd.read_json('https://node-api.flipsidecrypto.com/api/v2/queries/4c5dbb8e-3d3a-4ecf-a245-c7e36b92f4ea/data/latest')
+    with c1:
+        st.metric(label='**Total Number of Swaps IN**', value=str(near_swaps['NO_OF_SWAPS_IN'].values[0]))
+    with c2:
+        st.metric(label='**Total Number of Swaps OUT**', value=str(near_swaps['NO_OF_SWAPS_OUT'].values[0]))
+    
+    c1, c2 = st.columns([1,1])
+    near_swaps_volume = pd.read_json('https://node-api.flipsidecrypto.com/api/v2/queries/b0d1bded-7b96-4c72-b68f-5142044a38cf/data/latest')
+    with c1:
+        st.metric(label='**Total Swap IN Volume**', value=str(near_swaps_volume['SWAP_IN_VOLUME_USD'].values[0]))
+    with c2:
+        st.metric(label='**Total Swap OUT Volume**', value=str(near_swaps_volume['SWAP_OUT_VOLUME_USD'].values[0]))
+    
+    c1, c2 = st.columns([1,1])
+    near_swappers = pd.read_json('https://node-api.flipsidecrypto.com/api/v2/queries/fc89e9b0-26d3-491e-b3d8-2351138e9b87/data/latest')
+    with c1:
+        st.metric(label='**Number of Swappers who swapped into the NEAR**', value=str(near_swappers['NO_OF_SWAPPERS_IN'].values[0]))
+    with c2:
+        st.metric(label='**Number of Swappers who swapped out the NEAR**', value=str(near_swappers['NO_OF_SWAPPERS_OUT'].values[0]))
+    
+    c1, c2 = st.columns([1,1])
+    with c1:
+        top_near_swappers_1 = pd.read_json('https://node-api.flipsidecrypto.com/api/v2/queries/e0fefd99-8536-433f-9c83-fad067a3e2f5/data/latest')
+        fig = px.pie(top_near_swappers_1, values='SWAP_IN_VOLUME_USD', names='SWAPPER', title='Top Swappers who Swapped into the NEAR by Volume (in $)')
+        fig.update_layout(showlegend = False)
+        st.plotly_chart(fig, use_container_width=True, theme=theme_plotly)
+
+    with c2:
+        top_near_swappers_2 = pd.read_json('https://node-api.flipsidecrypto.com/api/v2/queries/1cc3e8ed-b59c-465d-8669-635e6fb53338/data/latest')
+        fig = px.pie(top_near_swappers_2, values='SWAP_OUT_VOLUME_USD', names='SWAPPER', title='Top Swappers who Swapped out the NEAR by Volume (in $)')
+        fig.update_layout(showlegend = False)
+        st.plotly_chart(fig, use_container_width=True, theme=theme_plotly)
+
+with tab3:
 
 
 
+
+
+
+    
