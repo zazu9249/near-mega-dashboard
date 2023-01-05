@@ -74,17 +74,16 @@ fig = px.line(df, x='HOUR', y='HOURLY_PRICE', title='Hourly Price Trend of NEAR'
 fig.update_layout(legend_title=None, xaxis_title='Hour', yaxis_title='Price (in $)')
 st.plotly_chart(fig, use_container_width=True, theme=theme_plotly)
 
-tab5, tab4, tab3, tab2, tab1 = st.tabs(
+tab4, tab3, tab2, tab1 = st.tabs(
     [
         "**Metrics**",
         "**Swaps**",
         "**GAS & Fees**",
-        "**Development**",
         "**Staking**"
     ]
 )
 
-with tab5:
+with tab4:
     st.write(
         """
         Blockchain metrics are used to measure the quality, performance and scalability of 
@@ -126,6 +125,14 @@ with tab5:
     fig = px.bar(active_nodes,title='Number of Active Nodes over selected Time', x=active_nodes['DAY'], y=active_nodes['NO_OF_ACTIVE_NODES'])
     fig.update_layout(legend_title=None, xaxis_title='Time', yaxis_title='Active Nodes')
     st.plotly_chart(fig, use_container_width=True, theme=theme_plotly)
+
+    st.subheader("New Nodes")
+    new_nodes = pd.read_json('https://node-api.flipsidecrypto.com/api/v2/queries/3b4a99c8-8bc0-476d-82ed-a78a60242e15/data/latest')
+    fig = px.line(new_nodes, x="Join date", y="Cumulative", title="Number of New Nodes vs Cumulative New Nodes", log_y=True)
+    fig.add_trace(go.Bar(x=new_nodes["Join date"], y=new_nodes["New Wallets"]))
+    fig.update_layout(showlegend=False, legend_title=None, xaxis_title='DATE', yaxis_title='Number of Nodes')
+    st.plotly_chart(fig, use_container_width=True, theme=theme_plotly)
+    
 
     st.subheader("Blocks per Hour/Day")
     st.write(
@@ -215,7 +222,7 @@ with tab5:
     fig.update_layout(legend_title=None, xaxis_title='Day', yaxis_title="Latency")
     st.plotly_chart(fig, use_container_width=True, theme=theme_plotly)
 
-with tab4:
+with tab3:
     st.write(
         """
         Swap facilitates the instant exchange of two non-native tokens between two unique 
@@ -286,7 +293,7 @@ with tab4:
         fig.update_layout(showlegend = False)
         st.plotly_chart(fig, use_container_width=True, theme=theme_plotly)
 
-with tab3:
+with tab2:
     st.subheader("What is Transaction Fees?")
     st.write(
         """
@@ -345,6 +352,85 @@ with tab3:
 
     # fig = px.line(daily_fees, x="DAY", y="AVG_FEE_PER_TRADER", title="Average Transaction Fee per Trader on Weekly basis")
     # st.plotly_chart(fig, use_container_width=True, theme=theme_plotly)
+
+with tab1:
+    st.subheader("What is Staking?")
+    st.write(
+        """
+        Staking is when you lock crypto assets for a set period of time to help support the 
+        operation of a blockchain. In return for staking your crypto, you earn more cryptocurrency.
+
+        Many blockchains use a proof of stake consensus mechanism. Under this system, network 
+        participants who want to support the blockchain by validating new transactions and adding 
+        new blocks must “stake” set sums of cryptocurrency.
+        """
+    )
+    st.subheader("Staking on NEAR")
+    st.write(
+        """
+        Staking allows you to earn NEAR rewards in return for delegating your tokens with a validator. 
+        This is an essential process in Proof-of-Stake (PoS) blockchains which is required to ensure 
+        security and decentralisation. Staking is an important aspect of blockchains with a Proof-of-Stake 
+        mechanism, like NEAR.
+
+        Proof-of-Stake (PoS) is a consensus mechanism to determine which users get to create new 
+        blocks on the NEAR blockchain. New block creators are selected by the amount of NEAR they’ve 
+        locked-up in the network.
+
+        In the NEAR network, a decentralized pool of validators keeps the network secure by 
+        processing transactions and in return these validators receive a reward.
+
+        **Validators & Delegators:**
+
+        Validators are pieces of hardware, ran by individuals, groups, or organisations, 
+        which serve to secure, maintain, and run the NEAR blockchain.\n
+        Delegators are those who commit their NEAR to a validator to assist in securing the 
+        network and to earn rewards in the process.
+        """
+    )
+    
+    c1,c2 = st.columns([1,1])
+    with c1:
+        total_pools = pd.read_json('https://node-api.flipsidecrypto.com/api/v2/queries/3ea466a6-6f61-4893-8a09-38bec66030ef/data/latest')
+        st.metric(label='**Total Number of Staking Pools**', value=str(total_pools['TOTAL_NO_OF_POOLS'].values[0]))
+    with c2:
+        validators = pd.read_json('https://node-api.flipsidecrypto.com/api/v2/queries/80ce068a-dcc9-42e3-bd84-fee610dbba09/data/latest')
+        st.metric(label='**Total Number of Validators**', value=str(validators['NO_OF_VALIDATORS'].values[0]))
+    
+    c1,c2,c3 = st.columns([1,1,1])
+    pools = pd.read_json('https://node-api.flipsidecrypto.com/api/v2/queries/80ce068a-dcc9-42e3-bd84-fee610dbba09/data/latest')
+    with c1:
+        st.metric(label='**Minimum Size of the Pool**', value=str(pools['MIN_POOL'].values[0]))
+    with c2:
+        st.metric(label='**Maximum Size of the Pool**', value=str(pools['MAX_POOL'].values[0]))
+    with c3:
+        st.metric(label='**Median Size of the Pool**', value=str(pools['MEDIAN_POOL'].values[0]))
+
+
+    c1,c2 = st.columns([1,1])
+    with c1:
+        stakes = pd.read_json('https://node-api.flipsidecrypto.com/api/v2/queries/7e8e8862-c09d-441b-b135-42a985b284b9/data/latest')
+        fig = px.pie(stakes, values='TX_COUNT', names='ACTION', title='Total Number of Stakes/Unstakes')
+        fig.update_layout(showlegend = False)
+        st.plotly_chart(fig, use_container_width=True, theme=theme_plotly)
+    with c2:
+        stakes = pd.read_json('https://node-api.flipsidecrypto.com/api/v2/queries/7e8e8862-c09d-441b-b135-42a985b284b9/data/latest')
+        fig = px.pie(stakes, values='VOLUME', names='ACTION', title='Statking/Unstaking Volume')
+        fig.update_layout(showlegend = False)
+        st.plotly_chart(fig, use_container_width=True, theme=theme_plotly)
+    
+    stakes_over_time = pd.read_json('https://node-api.flipsidecrypto.com/api/v2/queries/44b84544-01f0-4489-8c34-18578a28f838/data/latest')
+    fig = px.bar(stakes_over_time, x='DATE', y='TX_COUNT', color='ACTION', title='Number of Stakes/Unstakes on Weekly basis')
+    fig.update_layout(showlegend=False, xaxis_title='WEEK', yaxis_title='Stakes/Unstakes')
+    st.plotly_chart(fig, use_container_width=True, theme=theme_plotly)
+    fig = px.bar(stakes_over_time, x='DATE', y='VOLUME', color='ACTION', title='Staking/Unstaking Volume on Weekly basis')
+    fig.update_layout(showlegend=False, xaxis_title='WEEK', yaxis_title='Staking Volume')
+    st.plotly_chart(fig, use_container_width=True, theme=theme_plotly)
+
+    validators_over_time = pd.read_json('https://node-api.flipsidecrypto.com/api/v2/queries/ff352b3d-ec72-4735-a563-7182990901a6/data/latest')
+    fig = px.line(validators_over_time, x="DATE", y="VALIDATOR", title="Number of Validators over Time")
+    fig.update_layout(xaxis_title='WEEK', yaxis_title='Number of Validators')
+    st.plotly_chart(fig, use_container_width=True, theme=theme_plotly)
 
 
 
