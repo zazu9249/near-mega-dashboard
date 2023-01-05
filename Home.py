@@ -74,6 +74,25 @@ fig = px.line(df, x='HOUR', y='HOURLY_PRICE', title='Hourly Price Trend of NEAR'
 fig.update_layout(legend_title=None, xaxis_title='Hour', yaxis_title='Price (in $)')
 st.plotly_chart(fig, use_container_width=True, theme=theme_plotly)
 
+st.header("Methodology")
+with st.expander("Method details and data sources"):
+    st.write(
+        """
+        In this mega dashboard, the data has been selected from flipside crypto 
+        (https://flipsidecrypto.xyz) data platform using its REST API. These queries are run every 
+        3 hours to include the latest data, and the JSON file is imported directly into each visualization.
+        This tool's source code is available in the 
+        [**GitHub Repository**](https://github.com/zazu9249/near-mega-dashboard).
+        A mega dashboard is designed and structured in multiple TABS that can be accessed using the sidebar.
+        There are several different segments of the NEAR ecosystem represented on each of these Tabs.
+        The NEAR's website allows you to explore each sector (Metrics, Swaps, GAS & Fees, Staking etc.) more deeply.
+        All the Metrics have been calculated since the start of NEAR Blockchain.
+
+        Here are the queries for all the visualizations: 
+        [**Flipside Collection**](https://app.flipsidecrypto.com/velocity/collections/e124693b-82b5-4ab0-b12e-c24a60f9bf54) 
+        """
+    )
+
 tab4, tab3, tab2, tab1 = st.tabs(
     [
         "**Metrics**",
