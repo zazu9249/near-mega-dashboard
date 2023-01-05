@@ -286,6 +286,65 @@ with tab4:
         fig.update_layout(showlegend = False)
         st.plotly_chart(fig, use_container_width=True, theme=theme_plotly)
 
+with tab3:
+    st.subheader("What is Transaction Fees?")
+    st.write(
+        """
+        Transaction fees are and have been an essential part of most blockchain systems 
+        since their inception. You are most likely to have come across them when sending, 
+        depositing, or withdrawing crypto.
+        
+        The majority of cryptocurrencies use transaction fees for two important reasons. 
+        First of all, fees reduce the amount of spam on the network. It also makes large-scale 
+        spam attacks costly and expensive to implement. Secondly, transaction fees act as an 
+        incentive for users that help verify and validate transactions. Think of it as a reward 
+        for helping the network.
+        """
+    )
+    st.subheader("What is GAS Fees?")
+    st.write(
+        """
+        A gas fee is the term given to transaction fees on the Ethereum (CRYPTO:ETH) blockchain 
+        network. According to Ethereum’s developer pages, gas is “the fuel that allows the 
+        [Ethereum network] to operate, in the same way that a car needs gasoline to run.”
+        
+        Other cryptocurrencies may simply call these transaction fees, miner fees, or something 
+        similar. However, since Ethereum is currently the second-largest crypto by market cap, 
+        the term “gas” is often applied when referring to the fees involved in executing work on 
+        other blockchains.
+        """
+    )
+    c1, c2, c3 = st.columns([1,1,1])
+    near_fees = pd.read_json('https://node-api.flipsidecrypto.com/api/v2/queries/de67356b-c2fa-4d8f-b594-11076d303964/data/latest')
+    with c1:
+        st.metric(label='**Total Transaction Fee (in NEAR)**', value=str(near_fees['TOTAL_TRANSACTION_FEE'].values[0]))
+    with c2:
+        st.metric(label='**Total Transaction Fee (in $)**', value=str(near_fees['TOTAL_TRANS_FEE_USD'].values[0]))
+    with c3:
+        st.metric(label='**Total GAS Used**', value=str(near_fees['TOTAL_GAS_USED'].values[0]))
+    
+    fees = pd.read_json('https://node-api.flipsidecrypto.com/api/v2/queries/2100bcb8-3a86-425f-a189-8491ba61b513/data/latest')
+    fig = px.bar(fees,title='Total Transaction Fees per Week', x=fees['DAY'], y=fees['TOTAL_TRANS_FEE_USD'])
+    fig.update_layout(legend_title=None, xaxis_title='Time', yaxis_title='Total Transaction Fee (in $)')
+    st.plotly_chart(fig, use_container_width=True, theme=theme_plotly)
+
+    fig = px.bar(fees,title='Total GAS Used per Week', x=fees['DAY'], y=fees['TOTAL_GAS_USED'])
+    fig.update_layout(legend_title=None, xaxis_title='Time', yaxis_title='Total GAS USed (in $)')
+    st.plotly_chart(fig, use_container_width=True, theme=theme_plotly)
+
+    c1, c2 = st.columns([1,1])
+    avg_fee_per_tx = pd.read_json('https://node-api.flipsidecrypto.com/api/v2/queries/b3e9b66b-84ce-4b01-ac8e-7de2d34cf48f/data/latest')
+    with c1:
+        st.metric(label='**Average Transaction Fee per Transaction (in $)**', value=str(avg_fee_per_tx['AVG_FEE_PER_TX'].values[0]))
+    with c2:
+        st.metric(label='**Average Transaction Fee per User (in $)**', value=str(avg_fee_per_tx['AVG_FEE_PER_TRADER'].values[0]))
+
+    daily_fees = pd.read_json('https://node-api.flipsidecrypto.com/api/v2/queries/b99f37d4-9fd6-4205-99cd-a13f93602e58/data/latest')
+    fig = px.line(daily_fees, x="DAY", y=["AVG_FEE_PER_TX", "AVG_FEE_PER_TRADER"], title="Average Transaction Fee per Transaction on Weekly basis", log_y=True)
+    st.plotly_chart(fig, use_container_width=True, theme=theme_plotly)
+
+    # fig = px.line(daily_fees, x="DAY", y="AVG_FEE_PER_TRADER", title="Average Transaction Fee per Trader on Weekly basis")
+    # st.plotly_chart(fig, use_container_width=True, theme=theme_plotly)
 
 
 
